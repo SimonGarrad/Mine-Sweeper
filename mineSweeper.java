@@ -10,7 +10,7 @@ public class mineSweeper{
         boolean go = true;
         boolean win = false;
 
-        while (go == true){
+        while (go){
             while(true){
                 out.println("Please choose a difficult setting: \neasy \nmedium \nhard\n");
                 String difficulty = scan.nextLine();
@@ -85,9 +85,9 @@ public class mineSweeper{
                 }
             }
 
-            // prints array showing mine placements. ******************************  for testing only!
-            out.println("\n");
-            printer(mineSweeper, size);
+            // // prints array showing mine placements. ******************************  for testing only!
+            // out.println("\n");
+            // printer(mineSweeper, size);
             
             long startTime = System.nanoTime();
 
@@ -163,7 +163,7 @@ public class mineSweeper{
                 }
 
                 win = checkWin(mineSweeper, playerArray, size, mines);
-                if (win == true){
+                if (win){
                     endGame(mineSweeper, playerArray, row, column, size, win);
                     long endTime = System.nanoTime();
                     timer(startTime, endTime);
