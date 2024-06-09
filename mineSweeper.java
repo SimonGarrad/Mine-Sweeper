@@ -10,8 +10,10 @@ public class mineSweeper{
         boolean go = true;
         boolean win = false;
 
+        //runs game
         while (go){
             while(true){
+                //difficulty settings
                 out.println("Please choose a difficult setting: \neasy \nmedium \nhard\n");
                 String difficulty = scan.nextLine();
 
@@ -34,7 +36,9 @@ public class mineSweeper{
                     out.println("\n*** Not a valid difficulty level.***\n");
                 }
             }
+            //sets the 2D array that will hold the mines
             String[][] mineSweeper = new String[size][size];
+            //sets the 2D array that the player will interact with
             String[][] playerArray = new String[size][size];
 
             for (int i = 0; i < size; i++){
@@ -71,11 +75,15 @@ public class mineSweeper{
                     out.print(playerArray[i][j]);
                 }
             }
-            for (int k = 0; k < mines; k++){
-                int width = random.nextInt(1, size);
-                int heigth = random.nextInt(1, size);
-                mineSweeper[width][heigth] = "[@ ]";
+            for (int k = 0; k < mines; k++) {
+                int width, height;
+                do {
+                    width = random.nextInt(1, size);
+                    height = random.nextInt(1, size);
+                } while (mineSweeper[width][height].equals("[@ ]"));
+                mineSweeper[width][height] = "[@ ]";
             }
+            
 
             for(int i = 1; i < size-1; i++){
                 for(int j = 1; j< size-1; j++){
@@ -137,7 +145,8 @@ public class mineSweeper{
                     printer(playerArray, size);
                 }else if (action.equals("s")){
                     turn(mineSweeper, playerArray, row, column, size, scan);
-                    if (mineSweeper[row][column] == "[@ ]"){
+                    if (mineSweeper[row][column].equals("[@ ]")) {
+                        win = false;
                         endGame(mineSweeper, playerArray, row, column, size, win);
                         long endTime = System.nanoTime();
                         out.println("\nGame Over!");
@@ -159,6 +168,7 @@ public class mineSweeper{
                             break;
                         }
                     }
+                    
                     printer(playerArray, size);
                 }
 
@@ -238,13 +248,12 @@ public class mineSweeper{
             return;
         }
     
-        if (!mines[row][col].equals("[@ ]") && !mines[row][col].equals("[  ]")){
+        if (!mines[row][col].equals("[@ ]") && !mines[row][col].equals("[  ]")) {
             String num = "|" + mines[row][col].substring(1, 2) + " |";
             player[row][col] = num;
-
             return;
         }
-
+    
         if (!mines[row][col].equals("[  ]") || player[row][col].equals("    ")) {
             return;
         }
@@ -252,7 +261,7 @@ public class mineSweeper{
         player[row][col] = "    ";
     
         empty(mines, player, row - 1, col, size);
-        empty(mines, player, row + 1, col, size); 
+        empty(mines, player, row + 1, col, size);
         empty(mines, player, row, col - 1, size);
         empty(mines, player, row, col + 1, size);
         empty(mines, player, row - 1, col - 1, size);
@@ -260,69 +269,71 @@ public class mineSweeper{
         empty(mines, player, row + 1, col - 1, size);
         empty(mines, player, row + 1, col + 1, size);
     }
+    
 
     public static void endGame(String[][] mineSweeper, String[][] playerArray, int row, int col, int size, boolean win){
-            out.println("\n");
-            for(int i = 1; i < size; i++){
-                for (int j = 1; j < size; j++){
-                    if(mineSweeper[i][j].equals("[@ ]")){
-                        playerArray[i][j] = "[@ ]";
-                    }
+        out.println("\n");
+        for(int i = 1; i < size; i++){
+            for (int j = 1; j < size; j++){
+                if(mineSweeper[i][j].equals("[@ ]")){
+                    playerArray[i][j] = "[@ ]";
                 }
             }
-            if (win == false){
-                playerArray[row][col] = "BOOM!";
-                printer(playerArray, size);
-            }else printer(playerArray, size);
-            
+        }
+        if (!win){
+            playerArray[row][col] = "BOOM!";
+            printer(playerArray, size);
+        }else {
+            printer(playerArray, size);
+        }
     }
+    
 
-    public static void turn(String[][] mineSweeper, String[][] player, int row, int col, int size, Scanner scan){
-        if(player[row][col].equals("[f ]")){
-            while(true){
+    public static void turn(String[][] mineSweeper, String[][] player, int row, int col, int size, Scanner scan) {
+        if (player[row][col].equals("[f ]")) {
+            while (true) {
                 System.out.println("This square is flagged, are you sure? y/n?");
                 String deflag = scan.nextLine();
-                if (deflag.equals("y")){
-                    String temp = mineSweeper[row][col].substring(1,2);
+                if (deflag.equals("y")) {
                     empty(mineSweeper, player, row, col, size);
-                    player[row][col] = " " + temp + "  ";
                     break;
-                } else if (deflag.equals("n")){
+                } else if (deflag.equals("n")) {
                     break;
-                } else System.out.println("Invalid input");
+                } else {
+                    System.out.println("Invalid input");
+                }
             }
         } else {
             empty(mineSweeper, player, row, col, size);
         }
     }
     
+    
 
     public static boolean checkWin(String[][] mineSweeper, String[][] player, int size, int mines) {
-    int correctFlags = 0;
-    int nonMineCellsRevealed = 0;
-    int totalNonMineCells = ((size - 1) * (size - 1)) - mines;
-
-    for (int i = 1; i < size; i++) {
-        for (int j = 1; j < size; j++) {
-            if (mineSweeper[i][j].equals("[@ ]")) {
-                if (player[i][j].equals("[f ]")) {
-                    correctFlags++;
-                }
-            } else {
-                // Check if the cell is a non-mine cell and it's revealed (not equal to "[  ]")
-                if (!player[i][j].equals("[  ]")) {
-                    nonMineCellsRevealed++;
+        int correctFlags = 0;
+        int nonMineCellsRevealed = 0;
+        int totalNonMineCells = ((size - 1) * (size - 1)) - mines;
+    
+        for (int i = 1; i < size; i++) {
+            for (int j = 1; j < size; j++) {
+                if (mineSweeper[i][j].equals("[@ ]")) {
+                    if (player[i][j].equals("[f ]")) {
+                        correctFlags++;
+                    }
+                } else {
+                    // Check if the cell is a non-mine cell and it's revealed (not equal to "[  ]")
+                    if (!player[i][j].equals("[  ]") && !player[i][j].equals("[f ]")) {
+                        nonMineCellsRevealed++;
+                    }
                 }
             }
         }
+    
+        // Win condition: all non-mine cells are revealed and all mines are correctly flagged
+        return (nonMineCellsRevealed == totalNonMineCells) && (correctFlags == mines);
     }
-
-    // Win condition: either all non-mine cells are revealed or all mines are correctly flagged
-    if (nonMineCellsRevealed == totalNonMineCells || correctFlags == mines) {
-        return true;
-    }
-    return false;
-}
+    
 
     public static void timer(long startTime, long endTime){
         long elapsedTime = endTime - startTime;
